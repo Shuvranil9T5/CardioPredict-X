@@ -1,0 +1,75 @@
+======================================
+ CARDIOPREDICT-X PROJECT DIAGNOSTIC
+======================================
+
+1. PROJECT LOCATION
+/Users/shuvranilchaudhuri/Desktop/CardioPredict-X
+
+2. PROJECT FILES
+./.github/workflows/ci.yml
+./.gitignore
+./.streamlit/config.toml
+./Dockerfile
+./README.md
+./app.py
+./artifacts/.gitkeep
+./artifacts/history.db
+./backend/__init__.py
+./backend/__pycache__/__init__.cpython-311.pyc
+./backend/__pycache__/main.cpython-311.pyc
+./backend/main.py
+./cardiopredict_diagnostic.txt
+./data/raw/.gitkeep
+./diagnose.sh
+./docker-compose.yml
+./frontend/index.html
+./frontend/src/main.tsx
+./frontend/src/style.css
+./frontend/src/ui.tsx
+./frontend/vite.config.ts
+./ml/__init__.py
+./ml/__pycache__/__init__.cpython-311.pyc
+./ml/__pycache__/dataset.cpython-311.pyc
+./ml/__pycache__/train.cpython-311.pyc
+./ml/dataset.py
+./ml/train.py
+./requirements.txt
+./tests/test_core.py
+
+3. PYTHON ENVIRONMENT
+Python 3.11.9
+pip 26.3 from /Users/shuvranilchaudhuri/Desktop/CardioPredict-X/.venv/lib/python3.11/site-packages/pip (python 3.11)
+
+4. REQUIRED PACKAGES
+Name: fastapi
+Version: 0.115.12
+Name: uvicorn
+Version: 0.34.2
+Name: scikit-learn
+Version: 1.7.2
+Name: pandas
+Version: 2.3.3
+Name: numpy
+Version: 2.4.6
+Name: xgboost
+Version: 3.2.0
+Name: joblib
+Version: 1.6.0
+
+5. MODEL FILES
+./artifacts/model.joblib
+
+6. BACKEND ENTRY POINTS
+./backend/main.py
+./app.py
+
+7. FRONTEND
+Frontend package.json found
+
+8. TEST FILES
+./tests/test_core.py
+
+9. GIT STATUS
+Git repository not initialized
+
+DIAGNOSTIC COMPLETED
