@@ -1,9 +1,9 @@
 from functools import lru_cache
-import json, os, io
+import json, os, io, secrets
 import numpy as np
 import pandas as pd
 import joblib
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import create_engine,text
@@ -38,7 +38,8 @@ def predict(r):
     for c in CAT:
         if pd.notna(x[c][0]) and x[c][0] not in b['categories'][c]: warnings.append(c+' unseen category')
     missing=int(x.isna().sum(axis=1).iloc[0]); abstain=bool(warnings or missing>3 or lo<=r.threshold<=hi); result={'score':p,'interval':[float(lo),float(hi)],'classification':'abstain' if abstain else ('present' if p>=r.threshold else 'absent'),'warnings':warnings,'missing':missing,'disclaimer':'Research classification only; not diagnosis or future risk. Ensemble spread is not a calibrated confidence interval.'}
-    if r.save and os.getenv('ENABLE_HISTORY')=='1':
+    if r.save and os.getenv('ENABLE_HISTORY')=='1' and os.getenv('HISTORY_API_TOKEN'):
+        # Only persist when the server operator has explicitly enabled protected history.
         with engine.begin() as conn:
             conn.execute(text('CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, created TEXT DEFAULT CURRENT_TIMESTAMP, result TEXT)')); conn.execute(text('INSERT INTO history(result) VALUES (:r)'),{'r':json.dumps(result)})
     return result
@@ -72,13 +73,21 @@ def stats():
     p=ROOT/'artifacts/dataset.csv'
     if not p.exists(): raise HTTPException(503,'Train first')
     d=pd.read_csv(p); return {'records':len(d),'missing':d.isna().sum().to_dict(),'centers':d.dataset.value_counts().to_dict()}
+def require_history_access(authorization: str | None):
+    token = os.getenv('HISTORY_API_TOKEN')
+    if os.getenv('ENABLE_HISTORY') != '1' or not token:
+        raise HTTPException(status_code=404, detail='History is disabled')
+    if not authorization or not authorization.startswith('Bearer ') or not secrets.compare_digest(authorization[7:], token):
+        raise HTTPException(status_code=401, detail='Unauthorized', headers={'WWW-Authenticate':'Bearer'})
+
 @app.get('/api/v1/history')
-def history():
+def history(authorization: str | None = Header(default=None)):
+    require_history_access(authorization)
     with engine.begin() as c:
         c.execute(text('CREATE TABLE IF NOT EXISTS history (id INTEGER PRIMARY KEY, created TEXT DEFAULT CURRENT_TIMESTAMP, result TEXT)')); return [dict(x) for x in c.execute(text('SELECT * FROM history ORDER BY id DESC')).mappings()]
 @app.delete('/api/v1/history')
-def clear():
-    history()
+def clear(authorization: str | None = Header(default=None)):
+    require_history_access(authorization)
     with engine.begin() as c: c.execute(text('DELETE FROM history'))
     return {'deleted':True}
 @app.post('/api/v1/report')
