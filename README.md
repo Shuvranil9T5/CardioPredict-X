@@ -27,3 +27,4 @@ Seven model candidates, training-only CV selection, logistic regression Optuna s
 
 ## Verification and limitations
 No actual dataset metrics are bundled. Run training to generate results. Global SHAP beeswarm/waterfall, full Optuna search for each model, feature-level what-if explanation differences, and comprehensive clinical validation are not implemented. No clinical use. The dashboard requires Streamlit installation and has not been browser-tested in the authoring environment.
+# CardioPredict-X
