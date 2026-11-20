@@ -6,3 +6,13 @@ data/raw/*
 !data/raw/.gitkeep
 .env
 .pytest_cache/
+
+# Frontend dependencies and output
+node_modules/
+frontend/dist/
+dist/
+.vite/
+.DS_Store
+*.log
+.env.*
+!.env.example
